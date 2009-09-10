@@ -5,8 +5,7 @@ import time
 import urllib
 import urllib2
 
-from decode import htmldecode
-from pytz import timezone
+from utils import decodehtml
 
 
 def sl(self, input):
@@ -35,7 +34,7 @@ def sl(self, input):
         earlat = urllib.urlencode(earlat)
         req = urllib2.Request(self.bot.sl_posttarget, earlat)
         data = urllib2.urlopen(req).read()
-        data = htmldecode(data)
+        data = decodehtml(data)
     
     if m.group("start"):
         start = m.group("start")
@@ -54,8 +53,7 @@ def sl(self, input):
         else:
             tpar = 1
     
-            localtime = timezone("Europe/Stockholm")
-            tid = str(localtime.fromutc(datetime.datetime.utcnow()))[11:16]
+            tid = str(self.localtime())[11:16]
     
         datestring = ""
         if date:
@@ -75,7 +73,7 @@ def sl(self, input):
 
         req = urllib2.Request(queryurl)
         data = urllib2.urlopen(req).read().replace("&nbsp;"," ")
-        data = htmldecode(data)
+        data = decodehtml(data)
 
         # if we get a choice for the "from"-field
         recheck = False
@@ -105,7 +103,7 @@ def sl(self, input):
     
             #req = urllib2.Request(queryurl)
             data = urllib.urlopen(queryurl).read().replace("&nbsp;"," ")
-            data = htmldecode(data)
+            data = decodehtml(data)
     
 
     #Find earlier/next post data
@@ -142,13 +140,8 @@ def sl(self, input):
     body = body[:body.index("Restid")].replace("  "," ")
     b2 = body[body.index("Du är framme"):]
     b1 = body[:body.index("Du är framme")]
-
-    head = trydecode(head)
-    b1 = trydecode(b1)
-    b2 = trydecode(b2)
-    foot = trydecode(foot)
     
-    self.say(chr(2) + head + chr(2))# "från xx till xx den blabla"
+    self.say("\x02%s\x02" % head)# "från xx till xx den blabla"
     self.say(b1)# "tag ... från ..."
     self.say(b2)# "du är framme...."
     self.say(foot) # "restid xx minuter"
